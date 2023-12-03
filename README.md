@@ -142,8 +142,8 @@ click ctrl+c button to stop
 
 insert below code inside of "scripts"
 ```
-    "pm2:start": "pm2 start npm --name 'sampleapp-3tier-backend' -- start",
-    "pm2:stop": "pm2 stop sampleapp-3tier-backend",
+    "pm2:start": "pm2 start npm --name 'sampleapp-3tier-middleware' -- start",
+    "pm2:stop": "pm2 stop sampleapp-3tier-middleware",
 ```
 
 ### Run nestjs application with pm2
