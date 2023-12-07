@@ -1,3 +1,129 @@
+
+# AWS deployment
+
+### Connect Web server with Bastion Host
+Connect Bastion Host from your computer
+```
+ssh -i ~/.ssh/your-key-pair.pem ec2-user@your-instance-bastion-host-ip
+```
+
+Connect Web server with your Bastion Host
+```
+ssh -i ~/.ssh/your-key-pair.pem ec2-user@your-instance-web-server-ip
+```
+
+### Configure the EC2 instance
+```
+sudo yum update
+```
+
+### Install Node.js and npm
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+```
+
+### Activate nvm
+```
+. ~/.nvm/nvm.sh
+```
+
+### Install node 16
+```
+nvm install 16
+```
+
+### Check versions
+```
+node -v
+npm -v
+```
+
+Note: Amazon linux 2 supports node 16 and below
+
+###  Install git
+```
+sudo yum install git
+```
+
+### Create ssh key used on Github
+```
+nano ~/.ssh/id_rsa
+```
+Copy your deployer private ssh key and save exit.
+
+```
+chmod 600 ~/.ssh/id_rsa
+```
+Change permission of private ssh key
+
+### Clone your project
+```
+git clone <repository-url>
+```
+
+### Install project dependencies
+```
+cd <repository>
+npm install
+```
+
+### Change database Settings
+```
+nano src/system_settings/system_settings.service.ts
+```
+
+Change below to your application server  
+from `his.httpService.get<SystemSettingEntitiy[]>('http://localhost:3002/system_settings')`  
+to `his.httpService.get<SystemSettingEntitiy[]>('http://your application server ip:3000/system_settings')`   
+
+### Build app for deploy
+```
+npm run build
+```
+
+### Run application with production mode
+```
+npm run start:prod
+```
+
+### Check application running
+```
+curl "http://localhost:3000/system_settings
+```
+This should return your database value on json format
+
+### Stop npm and install PM2
+click ctrl+c button to stop 
+```
+npm install pm2 -g
+```
+
+### Configure nestjs torun pm2
+```
+nano package.json
+```
+
+insert below code inside of "scripts"
+```
+    "pm2:start": "pm2 start npm --name 'sampleapp-3tier-middleware' -- start",
+    "pm2:stop": "pm2 stop sampleapp-3tier-middleware",
+```
+
+### Run nestjs application with pm2
+```
+npm run pm2:start
+```
+
+check pm2 status
+```
+pm2 status
+```
+
+check pm2 logs
+```
+pm2 logs
+```
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
@@ -71,87 +197,3 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](LICENSE).
-
-# AWS deployment
-
-### Connect Web server with Bastion Host
-Connect Bastion Host from your computer
-`ssh -i ~/.ssh/your-key-pair.pem ec2-user@your-instance-bastion-host-ip`
-
-Connect Web server with your Bastion Host
-`ssh -i ~/.ssh/your-key-pair.pem ec2-user@your-instance-web-server-ip`
-
-### Configure the EC2 instance
-`sudo yum update`
-
-### Install Node.js and npm
-`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash`
-
-### Activate nvm
-`. ~/.nvm/nvm.sh`
-
-### Install node 16
-`nvm install 16`
-
-### Check versions
-`node -v`
-`npm -v`
-
-Note: Amazon linux 2 supports node 16 and below
-
-###  Install git
-`sudo yum install git`
-
-### Create ssh key used on Github
-`nano ~/.ssh/id_rsa`
-Copy your deployer private ssh key and save exit.
-
-### Clone your project
-`git clone <repository-url>`
-
-### Install project dependencies
-`cd <repository>`
-`npm install`
-
-### Change database Settings
-
-`nano src/system_settings/system_settings.service.ts`
-
-Change below to your application server
-from `his.httpService.get<SystemSettingEntitiy[]>('http://localhost:3002/system_settings')`
-to `his.httpService.get<SystemSettingEntitiy[]>('http://your application server ip:3000/system_settings')` 
-
-### Build app for deploy
-`npm run build`
-
-### Run application with production mode
-`npm run start:prod`
-
-### Check application running
-`curl "http://localhost:3000/system_settings`
-This should return your database value on json format
-
-### Stop npm and install PM2
-click ctrl+c button to stop 
-
-`npm install pm2 -g`
-
-### Configure nestjs torun pm2
-
-`nano package.json`
-
-insert below code inside of "scripts"
-```
-    "pm2:start": "pm2 start npm --name 'sampleapp-3tier-middleware' -- start",
-    "pm2:stop": "pm2 stop sampleapp-3tier-middleware",
-```
-
-### Run nestjs application with pm2
-
-`npm run pm2:start`
-
-check pm2 status
-`pm2 status`
-
-check pm2 logs
-`pm2 logs`
